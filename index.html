@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Horaires — Florence</title>
+<title>Horaires des salles — Florence</title>
 <style>
   :root{
     --bg:#ffffff;
@@ -50,7 +50,7 @@
     color: var(--text);
     padding: 10px 12px;
     border-radius: 12px;
-    font-weight: 800;
+    font-weight: 700;
     cursor: pointer;
     box-shadow: 0 2px 0 rgba(10,15,26,.03);
   }
@@ -62,7 +62,7 @@
     color: var(--text);
     padding:10px 12px;
     border-radius:999px;
-    font-weight:900;
+    font-weight:800;
     font-size:13px;
     display:flex;align-items:center;justify-content:center;gap:8px;
     cursor:pointer;
@@ -85,7 +85,7 @@
     font-size:13px;
     cursor:pointer;
     user-select:none;
-    font-weight:800;
+    font-weight:700;
   }
   .chip[aria-pressed="true"]{background:var(--chipOn);}
   .field{flex:1;min-width:180px;display:flex;gap:8px;align-items:center;position:relative;}
@@ -112,7 +112,7 @@
   }
   .card:active{transform: translateY(1px);}
   .cardTop{display:flex;gap:10px;align-items:baseline;justify-content:space-between;}
-  .room{font-weight:950;letter-spacing:.3px;font-size:16px;}
+  .room{font-weight:900;letter-spacing:.3px;font-size:16px;}
   .badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
   .badge{
     font-size:12px;
@@ -122,7 +122,7 @@
     background: var(--soft);
     color: var(--text);
     white-space:nowrap;
-    font-weight:900;
+    font-weight:800;
   }
   .badge.ok{border-color: rgba(22,163,74,.35); background: rgba(22,163,74,.10); color: #0f7a33;}
   .badge.busy{border-color: rgba(217,119,6,.35); background: rgba(217,119,6,.12); color: #a85a00;}
@@ -149,22 +149,31 @@
     border-bottom: 1px solid var(--hair);
     font-size: 12px;
     color: var(--muted);
-    font-weight: 900;
+    font-weight: 800;
   }
   .suggest .item{
     padding: 10px 10px;
     border-bottom: 1px solid var(--hair);
     cursor:pointer;
-    font-weight: 800;
+    font-weight: 700;
   }
   .suggest .item:last-child{border-bottom:none;}
-  .suggest .item small{display:block;color:var(--muted);font-weight:700;margin-top:2px;}
+  .suggest .item small{display:block;color:var(--muted);font-weight:600;margin-top:2px;}
 
-  /* Table */
+  /* Modal */
+  .modal{position:fixed;inset:0;z-index:50;display:none;align-items:flex-end;justify-content:center;background: rgba(10,15,26,.45);padding:12px;padding-bottom: calc(var(--safeBottom) + 12px);}
+  .modal.show{display:flex;}
+  .sheet{width:100%;max-width:980px;max-height:88vh;overflow:hidden;border-radius:22px;border:1px solid var(--hair);background:#fff;box-shadow:var(--shadow);}
+  .sheetHeader{padding:12px 12px 10px;border-bottom:1px solid var(--hair);display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--soft);}
+  .sheetTitle{display:flex;flex-direction:column;gap:2px;}
+  .sheetTitle .big{font-weight:950;font-size:16px;}
+  .sheetTitle .small{font-size:12px;color:var(--muted);}
+  .xbtn{width:42px;height:38px;border-radius:12px;display:grid;place-items:center;background:#fff;}
+  .sheetBody{padding:12px;overflow:auto;max-height: calc(88vh - 64px);}
   .grid{width:100%;border-collapse:collapse;border-radius:16px;overflow:hidden;border:1px solid var(--hair);background:#fff;}
   .grid th,.grid td{border-bottom:1px solid var(--hair);border-right:1px solid var(--hair);padding:8px 8px;vertical-align:top;font-size:12px;line-height:1.25;white-space:pre-line;}
-  .grid th{position:sticky;top:0;background:var(--soft2);z-index:1;font-weight:950;}
-  .grid td:first-child,.grid th:first-child{position:sticky;left:0;background:var(--soft);z-index:2;font-weight:950;min-width:108px;}
+  .grid th{position:sticky;top:0;background:var(--soft2);z-index:1;font-weight:900;}
+  .grid td:first-child,.grid th:first-child{position:sticky;left:0;background:var(--soft);z-index:2;font-weight:900;}
   .cellFree{color:var(--muted);}
   .cellBusy{color:var(--text);}
   .hl{outline: 2px solid rgba(59,130,246,.55); outline-offset:-2px; border-radius:10px;}
@@ -175,7 +184,7 @@
   <header>
     <div class="topbar">
       <div>
-        <h1>Horaires</h1>
+        <h1>Horaires des salles</h1>
         <div class="sub">Cycle d'orientation de la Florence • Généré le <span id="genDate">07.01.2026</span></div>
       </div>
       <button id="nowBtn" title="Se caler sur l'heure actuelle" style="white-space:nowrap">Maintenant</button>
@@ -185,9 +194,9 @@
         <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 22a9 9 0 1 0-9-9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 7v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Libre/Occupé
       </div>
-      <div class="tab" id="tabPlan" role="tab" aria-selected="false" tabindex="-1">
-        <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M7 3v3M17 3v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 8h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6 6h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Planning
+      <div class="tab" id="tabRoom" role="tab" aria-selected="false" tabindex="-1">
+        <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 10h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Planning salle
       </div>
     </div>
   </header>
@@ -210,7 +219,7 @@
 
       <div class="row">
         <div class="field">
-          <input id="search" type="search" placeholder="Recherche: salle, prof, classe, cours…" autocomplete="off" />
+          <input id="search" type="search" placeholder="Recherche: prof, classe, salle, cours…" autocomplete="off" />
           <div class="suggest" id="suggest"></div>
         </div>
         <button id="onlyFreeBtn" aria-pressed="false" title="Afficher uniquement les salles libres">Libre uniquement</button>
@@ -223,35 +232,37 @@
     <div class="empty" id="emptyFree" style="display:none;">Aucun résultat avec ces filtres.</div>
   </section>
 
-  <section id="viewPlan" class="panel" aria-label="Planning" style="display:none;">
+  <section id="viewRoom" class="panel" aria-label="Planning salle" style="display:none;">
     <div class="controls">
-      <div class="row tight">
-        <div class="seg" id="typeSeg" aria-label="Type"></div>
-        <div class="seg right" id="semSeg2" aria-label="Semestre"></div>
-      </div>
-
       <div class="row">
-        <div class="field" id="selRoomWrap">
+        <div class="field">
           <select id="roomSel" aria-label="Choisir une salle"></select>
         </div>
-        <div class="field" id="selProfWrap" style="display:none;">
-          <select id="profSel" aria-label="Choisir un prof"></select>
-        </div>
-        <div class="field" id="selClassWrap" style="display:none;">
-          <select id="classSel" aria-label="Choisir une classe"></select>
-        </div>
       </div>
-
       <div class="row tight">
         <div class="seg" id="daySeg2" aria-label="Jour"></div>
+        <div class="seg right" id="semSeg2" aria-label="Semestre"></div>
       </div>
-
-      <div class="hint" id="planHint"></div>
+      <div class="hint">Astuce: touche une salle dans “Libre/Occupé” pour ouvrir directement son planning.</div>
     </div>
-
-    <div id="planTableWrap" style="margin-top: 12px;"></div>
+    <div id="roomTableWrap" style="margin-top: 12px;"></div>
   </section>
 
+</div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="sheet" role="document">
+    <div class="sheetHeader">
+      <div class="sheetTitle">
+        <div class="big" id="modalTitle">Salle</div>
+        <div class="small" id="modalSub">Planning</div>
+      </div>
+      <button class="xbtn" id="closeModal" aria-label="Fermer">
+        <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="sheetBody"><div id="modalContent"></div></div>
+  </div>
 </div>
 
 <script>
@@ -269,8 +280,7 @@ var state = {
   onlyFree: false,
   search: "",
   mode: "any",     // any | prof | class | room
-  planType: "room", // room | prof | class
-  planKey: (DATA.rooms && DATA.rooms.length ? DATA.rooms[0].id : ""),
+  room: (DATA.rooms && DATA.rooms.length ? DATA.rooms[0].id : ""),
   sem2: "S1",
   day2: DATA.days[0]
 };
@@ -278,13 +288,6 @@ var state = {
 function dayFromDate(d){
   var map = {1:"Lundi",2:"Mardi",3:"Mercredi",4:"Jeudi",5:"Vendredi"};
   return map[d.getDay()] || "Lundi";
-}
-
-function stripTitle(q){
-  // enlève "m.", "mme", "mr", etc. au début
-  var s = String(q||"").trim();
-  s = s.replace(/^(m|mr|mme|ms|monsieur|madame)\.?\s+/i, "");
-  return s;
 }
 
 function parseHM(hm){
@@ -369,37 +372,29 @@ function normalizeClass(code){
 
 function buildIndexes(){
   var profSet = {};
+  var classSet = {};
   var roomSet = {};
-  var classNormSet = {};     // clés normalisées
-  var classNormToRaw = {};   // norm -> raw (première vue)
-
   for(var r=0;r<DATA.rooms.length;r++){
     var room = DATA.rooms[r];
     roomSet[room.id] = true;
-
     for(var si=0;si<DATA.semesters.length;si++){
       var sem = DATA.semesters[si].id;
       var sched = room.semesters ? room.semesters[sem] : null;
       if(!sched) continue;
-
       for(var di=0;di<DATA.days.length;di++){
         var day = DATA.days[di];
         var dayObj = sched[day];
         if(!dayObj) continue;
-
         for(var pi=0;pi<DATA.periods.length;pi++){
           var pid = DATA.periods[pi].id;
           var cell = dayObj[pid] || "";
-
           var teachers = extractTeachersFromCell(cell);
           for(var t=0;t<teachers.length;t++) profSet[teachers[t]] = true;
 
           var classes = extractClassesFromCell(cell);
           for(var c=0;c<classes.length;c++){
-            var raw = String(classes[c]||"").toUpperCase();
-            var norm = normalizeClass(raw);
-            classNormSet[norm] = true;
-            if(!classNormToRaw[norm]) classNormToRaw[norm] = raw;
+            classSet[classes[c].toUpperCase()] = true;
+            classSet[normalizeClass(classes[c])] = true; // aussi normalisé
           }
         }
       }
@@ -415,79 +410,22 @@ function buildIndexes(){
 
   return {
     profs: keys(profSet),
-    rooms: keys(roomSet),
-    classNorms: keys(classNormSet),
-    classNormToRaw: classNormToRaw
+    classes: keys(classSet),
+    rooms: keys(roomSet)
   };
 }
 
 var INDEX = buildIndexes();
-
-/* ---- Inversion (prof/classe -> planning) ---- */
-
-function ensurePath(root, a,b,c,d){
-  if(!root[a]) root[a] = {};
-  if(!root[a][b]) root[a][b] = {};
-  if(!root[a][b][c]) root[a][b][c] = {};
-  if(!root[a][b][c][d]) root[a][b][c][d] = [];
-  return root[a][b][c][d];
-}
-
-function buildInversions(){
-  var invProf = {};  // profName -> sem -> day -> pid -> [{room, cell}]
-  var invClass = {}; // classNorm -> sem -> day -> pid -> [{room, cell}]
-
-  for(var r=0;r<DATA.rooms.length;r++){
-    var room = DATA.rooms[r];
-    var roomId = room.id;
-
-    for(var si=0;si<DATA.semesters.length;si++){
-      var sem = DATA.semesters[si].id;
-      var sched = room.semesters ? room.semesters[sem] : null;
-      if(!sched) continue;
-
-      for(var di=0;di<DATA.days.length;di++){
-        var day = DATA.days[di];
-        var dayObj = sched[day];
-        if(!dayObj) continue;
-
-        for(var pi=0;pi<DATA.periods.length;pi++){
-          var pid = DATA.periods[pi].id;
-          var cell = dayObj[pid] || "";
-          if(!cell) continue;
-
-          // profs
-          var teachers = extractTeachersFromCell(cell);
-          for(var t=0;t<teachers.length;t++){
-            var prof = teachers[t];
-            ensurePath(invProf, prof, sem, day, pid).push({room: roomId, cell: cell});
-          }
-
-          // classes
-          var classes = extractClassesFromCell(cell);
-          for(var c=0;c<classes.length;c++){
-            var norm = normalizeClass(classes[c]);
-            ensurePath(invClass, norm, sem, day, pid).push({room: roomId, cell: cell});
-          }
-        }
-      }
-    }
-  }
-
-  return { prof: invProf, cls: invClass };
-}
-
-var INV = buildInversions();
 
 /* ---- UI helpers ---- */
 
 function setView(view){
   state.view = view;
   $("#viewFree").style.display = (view === "free") ? "" : "none";
-  $("#viewPlan").style.display = (view === "plan") ? "" : "none";
+  $("#viewRoom").style.display = (view === "room") ? "" : "none";
   $("#tabFree").setAttribute("aria-selected", view === "free" ? "true":"false");
-  $("#tabPlan").setAttribute("aria-selected", view === "plan" ? "true":"false");
-  if(view === "plan") renderPlanTable();
+  $("#tabRoom").setAttribute("aria-selected", view === "room" ? "true":"false");
+  if(view === "room") renderRoomTable();
 }
 
 function buildSeg(el, items, current, onPick){
@@ -521,23 +459,10 @@ function rebuildSemSeg(){
   buildSeg($("#semSeg"), DATA.semesters, state.sem, function(s){ state.sem=s; rebuildSemSeg(); renderFreeList(); });
 }
 function rebuildDaySeg2(){
-  buildSeg($("#daySeg2"), DATA.days, state.day2, function(d){ state.day2=d; rebuildDaySeg2(); renderPlanTable(); });
+  buildSeg($("#daySeg2"), DATA.days, state.day2, function(d){ state.day2=d; rebuildDaySeg2(); renderRoomTable(); });
 }
 function rebuildSemSeg2(){
-  buildSeg($("#semSeg2"), DATA.semesters, state.sem2, function(s){ state.sem2=s; rebuildSemSeg2(); renderPlanTable(); });
-}
-
-function rebuildTypeSeg(){
-  var items = [
-    {id:"room", label:"Salle"},
-    {id:"prof", label:"Prof"},
-    {id:"class", label:"Classe"}
-  ];
-  buildSeg($("#typeSeg"), items, state.planType, function(t){
-    state.planType = t;
-    syncPlanSelectors();
-    renderPlanTable();
-  });
+  buildSeg($("#semSeg2"), DATA.semesters, state.sem2, function(s){ state.sem2=s; rebuildSemSeg2(); renderRoomTable(); });
 }
 
 function buildPeriodSelect(){
@@ -566,69 +491,7 @@ function buildRoomSelect(){
     o.textContent = r.id + " — " + (r.type ? r.type + " • " : "") + (r.floor || "");
     sel.appendChild(o);
   }
-  if(!state.planKey || state.planType !== "room") state.planKey = rooms.length ? rooms[0].id : "";
-  sel.value = state.planType === "room" ? state.planKey : (rooms.length ? rooms[0].id : "");
-}
-
-function buildProfSelect(){
-  var sel = $("#profSel");
-  sel.innerHTML = "";
-  for(var i=0;i<INDEX.profs.length;i++){
-    var name = INDEX.profs[i];
-    var o = document.createElement("option");
-    o.value = name;
-    o.textContent = name;
-    sel.appendChild(o);
-  }
-  if(state.planType === "prof"){
-    if(!state.planKey) state.planKey = INDEX.profs.length ? INDEX.profs[0] : "";
-    sel.value = state.planKey;
-  } else {
-    sel.value = INDEX.profs.length ? INDEX.profs[0] : "";
-  }
-}
-
-function buildClassSelect(){
-  var sel = $("#classSel");
-  sel.innerHTML = "";
-  for(var i=0;i<INDEX.classNorms.length;i++){
-    var norm = INDEX.classNorms[i];
-    var raw = INDEX.classNormToRaw[norm] || norm;
-    var o = document.createElement("option");
-    o.value = norm;
-    o.textContent = raw;
-    sel.appendChild(o);
-  }
-  if(state.planType === "class"){
-    if(!state.planKey) state.planKey = INDEX.classNorms.length ? INDEX.classNorms[0] : "";
-    sel.value = state.planKey;
-  } else {
-    sel.value = INDEX.classNorms.length ? INDEX.classNorms[0] : "";
-  }
-}
-
-function syncPlanSelectors(){
-  $("#selRoomWrap").style.display = (state.planType === "room") ? "" : "none";
-  $("#selProfWrap").style.display = (state.planType === "prof") ? "" : "none";
-  $("#selClassWrap").style.display = (state.planType === "class") ? "" : "none";
-
-  if(state.planType === "room"){
-    state.planKey = $("#roomSel").value;
-  } else if(state.planType === "prof"){
-    state.planKey = $("#profSel").value;
-  } else {
-    state.planKey = $("#classSel").value;
-  }
-
-  var hint = "";
-  if(state.planType === "room"){
-    hint = "Planning de la salle sélectionnée.";
-  } else if(state.planType === "prof"){
-    hint = "Planning du prof (déduit du PDF des salles).";
-  } else {
-    hint = "Planning de la classe (déduit du PDF des salles).";
-  }
-  $("#planHint").textContent = hint;
+  sel.value = state.room || (rooms.length ? rooms[0].id : "");
 }
 
 /* ---- Suggestions ---- */
@@ -646,8 +509,7 @@ function containsCI(hay, needle){
 
 function renderSuggest(q){
   var box = $("#suggest");
-  q = stripTitle(q||"");
-  q = q.trim();
+  q = (q||"").trim();
   if(q.length < 2){
     box.classList.remove("show");
     box.innerHTML = "";
@@ -655,66 +517,26 @@ function renderSuggest(q){
   }
 
   function pick(mode, value){
-    // mode : room | prof | class | any
     state.mode = mode;
     $("#search").value = value;
     state.search = value;
     box.classList.remove("show");
     box.innerHTML = "";
     renderFreeList();
-
-    if(mode === "room"){
-      state.planType = "room";
-      state.planKey = value;
-      $("#roomSel").value = value;
-      setView("plan");
-      rebuildTypeSeg();
-      syncPlanSelectors();
-      renderPlanTable();
-    } else if(mode === "prof"){
-      state.planType = "prof";
-      state.planKey = value;
-      $("#profSel").value = value;
-      setView("plan");
-      rebuildTypeSeg();
-      syncPlanSelectors();
-      renderPlanTable();
-    } else if(mode === "class"){
-      var norm = normalizeClass(value);
-      state.planType = "class";
-      state.planKey = norm;
-      $("#classSel").value = norm;
-      setView("plan");
-      rebuildTypeSeg();
-      syncPlanSelectors();
-      renderPlanTable();
-    }
   }
 
   var maxEach = 6;
-
-  // rooms
-  var rooms = [];
-  for(var k=0;k<INDEX.rooms.length && rooms.length<maxEach;k++){
-    if(startsWithCI(INDEX.rooms[k], q)) rooms.push(INDEX.rooms[k]);
-  }
-
-  // profs
   var profs = [];
   for(var i=0;i<INDEX.profs.length && profs.length<maxEach;i++){
     if(startsWithCI(INDEX.profs[i], q) || containsCI(INDEX.profs[i], q)) profs.push(INDEX.profs[i]);
   }
-
-  // classes (match via raw label)
   var classes = [];
-  for(var j=0;j<INDEX.classNorms.length && classes.length<maxEach;j++){
-    var norm = INDEX.classNorms[j];
-    var raw = INDEX.classNormToRaw[norm] || norm;
-    if(startsWithCI(raw, q) || containsCI(raw, q) || startsWithCI(norm, q) || containsCI(norm, q)) classes.push(raw);
-    else if(/^[0-9]{3,4}$/.test(q)){
-      var qq = String(parseInt(q,10));
-      if(startsWithCI(norm, qq)) classes.push(raw);
-    }
+  for(var j=0;j<INDEX.classes.length && classes.length<maxEach;j++){
+    if(startsWithCI(INDEX.classes[j], q) || containsCI(INDEX.classes[j], q)) classes.push(INDEX.classes[j]);
+  }
+  var rooms = [];
+  for(var k=0;k<INDEX.rooms.length && rooms.length<maxEach;k++){
+    if(startsWithCI(INDEX.rooms[k], q)) rooms.push(INDEX.rooms[k]);
   }
 
   var html = "";
@@ -726,12 +548,12 @@ function renderSuggest(q){
             '</div>';
   }
 
-  if(rooms.length){ sec("Salles"); for(var a=0;a<rooms.length;a++) item(rooms[a], "Ouvrir le planning", "room", rooms[a]); }
-  if(profs.length){ sec("Profs"); for(var b=0;b<profs.length;b++) item(profs[b], "Ouvrir le planning", "prof", profs[b]); }
-  if(classes.length){ sec("Classes"); for(var c=0;c<classes.length;c++) item(classes[c], "Ouvrir le planning", "class", classes[c]); }
+  if(rooms.length){ sec("Salles"); for(var a=0;a<rooms.length;a++) item(rooms[a], "Aller directement à cette salle", "room", rooms[a]); }
+  if(profs.length){ sec("Profs"); for(var b=0;b<profs.length;b++) item(profs[b], "Filtrer par prof", "prof", profs[b]); }
+  if(classes.length){ sec("Classes"); for(var c=0;c<classes.length;c++) item(classes[c], "Filtrer par classe", "class", classes[c]); }
 
   sec("Texte");
-  item(q, "Filtrer dans cours / contenu", "any", q);
+  item(q, "Recherche dans cours / contenu", "any", q);
 
   box.innerHTML = html;
   box.classList.add("show");
@@ -751,9 +573,6 @@ function renderSuggest(q){
 /* ---- Filtering ---- */
 
 function matchesMode(room, cell, q){
-  if(!q) return true;
-
-  q = stripTitle(q||"").trim();
   if(!q) return true;
 
   var mode = state.mode || "any";
@@ -787,7 +606,6 @@ function matchesMode(room, cell, q){
     return false;
   }
 
-  // mode any
   var hay = (roomId + " " + type + " " + floor + " " + cell).toLowerCase();
   var needle = String(q).toLowerCase();
   if(hay.indexOf(needle) !== -1) return true;
@@ -855,15 +673,7 @@ function renderFreeList(){
     var card = document.createElement("div");
     card.className = "card";
     (function(roomId){
-      card.addEventListener("click", function(){
-        state.planType = "room";
-        state.planKey = roomId;
-        $("#roomSel").value = roomId;
-        setView("plan");
-        rebuildTypeSeg();
-        syncPlanSelectors();
-        renderPlanTable();
-      });
+      card.addEventListener("click", function(){ openRoomModal(roomId, sem, day, selectedPeriod); });
     })(r.id);
 
     var top = document.createElement("div");
@@ -900,82 +710,21 @@ function renderFreeList(){
   }
 }
 
-/* ---- Planning table (Salle / Prof / Classe) ---- */
-
-function findRoom(roomId){
+function renderRoomTable(){
+  var wrap = $("#roomTableWrap");
+  var roomId = state.room;
+  var room = null;
   for(var i=0;i<DATA.rooms.length;i++){
-    if(DATA.rooms[i].id === roomId) return DATA.rooms[i];
+    if(DATA.rooms[i].id === roomId){ room = DATA.rooms[i]; break; }
   }
-  return null;
-}
-
-function stripExactLine(cell, line){
-  var lines = String(cell||"").split(/\\n+/);
-  var out = [];
-  for(var i=0;i<lines.length;i++){
-    var s = (lines[i]||"").trim();
-    if(!s) continue;
-    if(s === line) continue;
-    out.push(s);
+  if(!room){
+    wrap.innerHTML = '<div class="empty">Salle introuvable.</div>';
+    return;
   }
-  return out.join("\\n");
-}
-
-function formatOccList(list, modeKey){
-  if(!list || !list.length) return "";
-  var parts = [];
-  for(var i=0;i<list.length;i++){
-    var occ = list[i];
-    var txt = String(occ.cell || "");
-    if(modeKey && modeKey.type === "prof"){
-      txt = stripExactLine(txt, modeKey.key);
-    }
-    // prefix room
-    parts.push("Salle " + occ.room + "\\n" + txt);
-  }
-  return parts.join("\\n\\n");
-}
-
-function getPlanCell(sem, day, pid){
-  if(state.planType === "room"){
-    var room = findRoom(state.planKey);
-    if(!room) return "";
-    var sched = room.semesters ? room.semesters[sem] : null;
-    if(!sched || !sched[day]) return "";
-    return sched[day][pid] || "";
-  }
-  if(state.planType === "prof"){
-    var key = state.planKey;
-    var obj = INV.prof[key];
-    var list = obj && obj[sem] && obj[sem][day] && obj[sem][day][pid] ? obj[sem][day][pid] : [];
-    return formatOccList(list, {type:"prof", key:key});
-  }
-  // class
-  var norm = state.planKey;
-  var obj2 = INV.cls[norm];
-  var list2 = obj2 && obj2[sem] && obj2[sem][day] && obj2[sem][day][pid] ? obj2[sem][day][pid] : [];
-  return formatOccList(list2, null);
-}
-
-function planTitle(){
-  if(state.planType === "room"){
-    var room = findRoom(state.planKey);
-    if(!room) return "Salle";
-    return "Salle " + room.id + (room.type ? (" — " + room.type) : "");
-  }
-  if(state.planType === "prof"){
-    return "Prof — " + state.planKey;
-  }
-  var raw = INDEX.classNormToRaw[state.planKey] || state.planKey;
-  return "Classe — " + raw;
-}
-
-function renderPlanTable(){
-  var wrap = $("#planTableWrap");
-  wrap.innerHTML = "";
 
   var sem = state.sem2;
-  var dayHL = state.day2;
+  var day = state.day2;
+  var sched = room.semesters ? room.semesters[sem] : null;
 
   var table = document.createElement("table");
   table.className = "grid";
@@ -998,26 +747,25 @@ function renderPlanTable(){
     var per = DATA.periods[p];
     var tr = document.createElement("tr");
 
-    // FIX: vrai saut de ligne (pas "\n" affiché)
     var td0 = document.createElement("td");
-    td0.textContent = per.id + "\n" + per.start.replace(":","h") + "–" + per.end.replace(":","h");
+    td0.textContent = per.id + "\\n" + per.start.replace(":","h") + "–" + per.end.replace(":","h");
     tr.appendChild(td0);
 
     for(var dd=0;dd<DATA.days.length;dd++){
       var dayName = DATA.days[dd];
       var td = document.createElement("td");
-      var cell = getPlanCell(sem, dayName, per.id);
+      var cell = "";
+      if(sched && sched[dayName]) cell = sched[dayName][per.id] || "";
       td.className = cell ? "cellBusy" : "cellFree";
       td.textContent = cell ? String(cell) : "Libre";
-      if(dayName === dayHL) td.className += " hl";
+      if(dayName === day) td.className += " hl";
       tr.appendChild(td);
     }
-
     tbody.appendChild(tr);
   }
   table.appendChild(tbody);
 
-  // header
+  wrap.innerHTML = "";
   var head = document.createElement("div");
   head.style.display = "flex";
   head.style.gap = "10px";
@@ -1028,12 +776,85 @@ function renderPlanTable(){
 
   var left = document.createElement("div");
   left.innerHTML =
-    '<div style="font-weight:950;font-size:16px">' + planTitle() + '</div>' +
-    '<div class="hint">' + semLabel(sem) + '</div>';
+    '<div style="font-weight:950;font-size:16px">Salle ' + roomId + '</div>' +
+    '<div class="hint">' + semLabel(sem) + (room.type ? (" • " + room.type) : "") + '</div>';
   head.appendChild(left);
 
   wrap.appendChild(head);
   wrap.appendChild(table);
+}
+
+function openRoomModal(roomId, sem, day, period){
+  var room = null;
+  for(var i=0;i<DATA.rooms.length;i++){
+    if(DATA.rooms[i].id === roomId){ room = DATA.rooms[i]; break; }
+  }
+  if(!room) return;
+
+  $("#modalTitle").textContent = "Salle " + roomId;
+  $("#modalSub").textContent = semLabel(sem) + (room.type ? (" • " + room.type) : "");
+
+  var holder = document.createElement("div");
+  var table = document.createElement("table");
+  table.className = "grid";
+
+  var thead = document.createElement("thead");
+  var trh = document.createElement("tr");
+  var th0 = document.createElement("th");
+  th0.textContent = "Période";
+  trh.appendChild(th0);
+  for(var d=0;d<DATA.days.length;d++){
+    var th = document.createElement("th");
+    th.textContent = DATA.days[d];
+    trh.appendChild(th);
+  }
+  thead.appendChild(trh);
+  table.appendChild(thead);
+
+  var tbody = document.createElement("tbody");
+  var sched = room.semesters ? room.semesters[sem] : null;
+  for(var p=0;p<DATA.periods.length;p++){
+    var per = DATA.periods[p];
+    var tr = document.createElement("tr");
+
+    var td0 = document.createElement("td");
+    td0.textContent = per.id + "\\n" + per.start.replace(":","h") + "–" + per.end.replace(":","h");
+    tr.appendChild(td0);
+
+    for(var dd=0;dd<DATA.days.length;dd++){
+      var dayName = DATA.days[dd];
+      var td = document.createElement("td");
+      var cell = "";
+      if(sched && sched[dayName]) cell = sched[dayName][per.id] || "";
+      td.className = cell ? "cellBusy" : "cellFree";
+      td.textContent = cell ? String(cell) : "Libre";
+      if(dayName === day && per.id === period) td.className += " hl";
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  holder.appendChild(table);
+
+  $("#modalContent").innerHTML = "";
+  $("#modalContent").appendChild(holder);
+
+  $("#modal").classList.add("show");
+  $("#modal").setAttribute("aria-hidden","false");
+
+  // sync planning view too
+  state.room = roomId;
+  state.sem2 = sem;
+  state.day2 = day;
+  $("#roomSel").value = roomId;
+  rebuildSemSeg2();
+  rebuildDaySeg2();
+  renderRoomTable();
+}
+
+function closeModal(){
+  $("#modal").classList.remove("show");
+  $("#modal").setAttribute("aria-hidden","true");
 }
 
 function setNow(){
@@ -1055,35 +876,29 @@ function setNow(){
   rebuildDaySeg();
   rebuildDaySeg2();
   renderFreeList();
-  renderPlanTable();
+  renderRoomTable();
 }
 
 function init(){
-  // Tabs
   $("#tabFree").addEventListener("click", function(){ setView("free"); });
-  $("#tabPlan").addEventListener("click", function(){ setView("plan"); });
+  $("#tabRoom").addEventListener("click", function(){ setView("room"); });
 
-  // Segments
   rebuildDaySeg();
   rebuildSemSeg();
-  rebuildSemSeg2();
   rebuildDaySeg2();
-  rebuildTypeSeg();
+  rebuildSemSeg2();
 
-  // Period select
   buildPeriodSelect();
   $("#periodSel").addEventListener("change", function(e){
     state.period = e.target.value;
     renderFreeList();
   });
 
-  // Time
   $("#timeSel").addEventListener("input", function(e){
     state.time = e.target.value;
     renderFreeList();
   });
 
-  // Search + suggestions
   $("#search").addEventListener("input", function(e){
     state.search = e.target.value;
     state.mode = "any";
@@ -1102,7 +917,6 @@ function init(){
     box.classList.remove("show");
   });
 
-  // only free toggle
   $("#onlyFreeBtn").addEventListener("click", function(){
     state.onlyFree = !state.onlyFree;
     $("#onlyFreeBtn").setAttribute("aria-pressed", state.onlyFree ? "true":"false");
@@ -1110,42 +924,19 @@ function init(){
     renderFreeList();
   });
 
-  // Planning selectors
   buildRoomSelect();
-  buildProfSelect();
-  buildClassSelect();
-  syncPlanSelectors();
-
   $("#roomSel").addEventListener("change", function(e){
-    state.planType = "room";
-    state.planKey = e.target.value;
-    rebuildTypeSeg();
-    syncPlanSelectors();
-    renderPlanTable();
+    state.room = e.target.value;
+    renderRoomTable();
   });
 
-  $("#profSel").addEventListener("change", function(e){
-    state.planType = "prof";
-    state.planKey = e.target.value;
-    rebuildTypeSeg();
-    syncPlanSelectors();
-    renderPlanTable();
-  });
-
-  $("#classSel").addEventListener("change", function(e){
-    state.planType = "class";
-    state.planKey = e.target.value;
-    rebuildTypeSeg();
-    syncPlanSelectors();
-    renderPlanTable();
-  });
-
-  // Now button
   $("#nowBtn").addEventListener("click", setNow);
 
+  $("#closeModal").addEventListener("click", closeModal);
+  $("#modal").addEventListener("click", function(e){ if(e.target && e.target.id === "modal") closeModal(); });
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeModal(); });
+
   setNow();
-  renderFreeList();
-  renderPlanTable();
 }
 
 init();
