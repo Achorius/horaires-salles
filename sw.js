@@ -1,4 +1,4 @@
-const CACHE_NAME = "horaires-cache-v1";
+const CACHE_NAME = "horaires-cache-v3";
 const CORE_ASSETS = [
   "./",
   "./index.html",
