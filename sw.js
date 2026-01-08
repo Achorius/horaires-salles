@@ -1,4 +1,4 @@
-const CACHE_NAME = "horaires-cache-v3";
+const CACHE_NAME = "horaires-cache-v6-5";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -26,7 +26,6 @@ self.addEventListener("activate", (event) => {
 // Network-first for navigations (so updates arrive when online), cache-first for assets.
 self.addEventListener("fetch", (event) => {
   const req = event.request;
-
   if (req.method !== "GET") return;
 
   if (req.mode === "navigate") {
